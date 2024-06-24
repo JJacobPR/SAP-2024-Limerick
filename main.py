@@ -11,10 +11,6 @@ def read_expenses(file_path):
         # Read the Excel file into a DataFrame
         expenses_df = pd.read_excel(file_path)
 
-        # Display the first few rows of the DataFrame
-        print("First few rows of the expense data:")
-        print(expenses_df.head())
-
         return expenses_df
     except FileNotFoundError:
         print(f"File not found: {file_path}")
@@ -22,22 +18,45 @@ def read_expenses(file_path):
         print(f"An error occurred: {e}")
 
 
+def save_file_to_directory(file_path, save_dir, file_name):
+    try:
+        # Read the Excel file into a DataFrame
+        df = pd.read_excel(file_path)
+
+        # Ensure the save directory exists
+        os.makedirs(save_dir, exist_ok=True)
+
+        # Construct the full file path for saving
+        save_path = os.path.join(save_dir, file_name)
+
+        # Save the DataFrame to the specified path
+        df.to_excel(save_path, index=False)
+
+        print(f"File saved successfully at: {save_path}")
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 st.title('Expense Overview')
 
-expense_year = st.selectbox(
+st.session_state.year = st.selectbox(
     "Select year",
     ("2024", "2025", "2026", "2027", "2028", "2029", "2030"))
 
-expense_month = st.selectbox(
+st.session_state.month = st.selectbox(
     "Select month",
     ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"))
 
-if expense_year != '' and expense_month != '':
-    file_path = f'data/{expense_month}_{expense_year}.xlsx'
+if st.session_state.year != '' and st.session_state.month != '':
+    file_path = f'data/{st.session_state.month.lower()}_{st.session_state.year}.xlsx'
     if os.path.exists(file_path):
         st.subheader(read_expenses(file_path))
     else:
         st.subheader("No data for chosen month available, please upload a file")
+        file = st.file_uploader("Choose a file", type="xlsx", accept_multiple_files=False)
+        if file is not None:
+            save_file_to_directory(file, 'data', f'{st.session_state.month.lower()}_{st.session_state.year}.xlsx')
+            st.rerun()
 
