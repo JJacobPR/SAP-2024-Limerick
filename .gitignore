@@ -1,3 +1,6 @@
 .idea
 .venv
 etc
+share
+init
+include
