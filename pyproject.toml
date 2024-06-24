@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "saplimerick2024"
+name = "SAP-2024-Limerick"
 version = "0.1.0"
 description = ""
 authors = ["Jakub Janicki <jjanicki08@gmail.com>"]
