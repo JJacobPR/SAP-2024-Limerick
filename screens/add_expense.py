@@ -1,6 +1,7 @@
 import streamlit as st
 import datetime
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Initialize the expense categories if not already in session state
 if 'expense_categories' not in st.session_state:
@@ -43,6 +44,7 @@ def add_expenses():
         }
         add_expense_to_csv(new_expense)
         st.success("Expense added successfully!")
+        display_expense_plot()
 
 def add_expense_to_csv(expense):
     """
@@ -56,3 +58,24 @@ def add_expense_to_csv(expense):
     new_expense_df = pd.DataFrame([expense])
     df = pd.concat([df, new_expense_df], ignore_index=True)
     df.to_csv('expenses.csv', index=False)
+
+def display_expense_plot():
+    """
+    Reads the expenses from the CSV file and displays a bar plot.
+    """
+    try:
+        df = pd.read_csv('expenses.csv')
+        if df.empty:
+            st.write("No expenses to display.")
+            return
+        
+        fig, ax = plt.subplots()
+        df.groupby('Category')['Value'].sum().plot(kind='bar', ax=ax)
+        ax.set_title('Total Expenses by Category')
+        ax.set_xlabel('Category')
+        ax.set_ylabel('Total Expense Value')
+        st.pyplot(fig)
+    except FileNotFoundError:
+        st.write("No expenses to display.")
+
+# Add expenses and display plotz
