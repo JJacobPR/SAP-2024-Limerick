@@ -55,15 +55,40 @@ def view_expense():
                 st.session_state.expense_categories = [cat for cat in expenses['Expense Category'].unique().tolist() if pd.notna(cat)]
                 c1, c2 = st.columns(2)
 
-                selected_category = st.selectbox(
-                    "Select Expense Category",
-                    ["All"] + st.session_state.expense_categories
-                )
+                col1, col2, col3 = st.columns(3)
 
-                if selected_category != "All":
-                    filtered_expenses = expenses[expenses['Expense Category'] == selected_category]
+                with col1:
+                    selected_category = st.selectbox(
+                        "Select Expense Category",
+                        ["All"] + st.session_state.expense_categories
+                    )
+
+                with col2:
+                    st.text("")
+                    st.text("")
+                    selected_essential = st.checkbox("Essential", False)
+
+                with col3:
+                    st.text("")
+                    st.text("")
+                    selected_non_essential = st.checkbox("Non Essential", False)
+
+                # Filtering by necessity
+                if selected_essential and selected_non_essential:
+                    filtered_expenses = expenses
+                elif selected_essential:
+                    filtered_expenses = expenses[expenses['Expense Necessity'] == "Essential"]
+                elif selected_non_essential:
+                    filtered_expenses = expenses[expenses['Expense Necessity'] == "Non-Essential"]
                 else:
                     filtered_expenses = expenses
+
+                # Filtering by category
+                if selected_category != "All":
+                    filtered_expenses = filtered_expenses[expenses['Expense Category'] == selected_category]
+                else:
+                    filtered_expenses = expenses
+
 
                 st.write(f"### {selected_category} expenses")
                 st.dataframe(filtered_expenses, hide_index=True, use_container_width=True)
