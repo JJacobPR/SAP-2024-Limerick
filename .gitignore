@@ -4,3 +4,4 @@ etc
 share
 init
 include
+__pycache__
