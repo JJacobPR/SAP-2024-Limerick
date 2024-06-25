@@ -4,3 +4,7 @@ etc
 share
 init
 include
+__pycache__
+./lib/*
+bin/
+delete
