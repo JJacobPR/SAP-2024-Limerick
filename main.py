@@ -70,7 +70,7 @@ if st.session_state.year != '' and st.session_state.month != '':
             else:
                 filtered_expenses = expenses
 
-            st.write(f"### Expenses for {selected_category}")
+            st.write(f"### {selected_category} expenses")
             st.dataframe(filtered_expenses, hide_index=True, use_container_width=True)
     else:
         st.subheader("No data for chosen month available, please upload a file")
