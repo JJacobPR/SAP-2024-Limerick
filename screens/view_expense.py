@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import pandas as pd
 
+
 # Function to read and display the Excel file
 def read_expenses(file_path):
     try:
@@ -34,6 +35,7 @@ def save_file_to_directory(file_path, save_dir, file_name):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
 def view_expense():
     st.title('Expense Overview')
 
@@ -44,31 +46,32 @@ def view_expense():
 
     st.session_state.month = st.selectbox(
         "Select month",
-        ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+        ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
+         "December")
     )
 
     if st.session_state.year and st.session_state.month:
         file_path = f'data/{st.session_state.month.lower()}_{st.session_state.year}.xlsx'
         if os.path.exists(file_path):
             expenses = read_expenses(file_path)
-            if expenses is not None: 
-                st.session_state.expense_categories = [cat for cat in expenses['Expense Category'].unique().tolist() if pd.notna(cat)]
-                c1, c2 = st.columns(2)
+            if expenses is not None:
+                st.session_state.expense_categories = [cat for cat in expenses['Expense Category'].unique().tolist() if
+                                                       pd.notna(cat)]
 
-                col1, col2, col3 = st.columns(3)
+                col1_filtering, col2_filtering, col3_filtering = st.columns(3)
 
-                with col1:
+                with col1_filtering:
                     selected_category = st.selectbox(
                         "Select Expense Category",
                         ["All"] + st.session_state.expense_categories
                     )
 
-                with col2:
+                with col2_filtering:
                     st.text("")
                     st.text("")
                     selected_essential = st.checkbox("Essential", False)
 
-                with col3:
+                with col3_filtering:
                     st.text("")
                     st.text("")
                     selected_non_essential = st.checkbox("Non Essential", False)
@@ -76,26 +79,36 @@ def view_expense():
                 # Filtering by necessity
                 if selected_essential and selected_non_essential:
                     filtered_expenses = expenses
+                    neccesity_label = ""
                 elif selected_essential:
                     filtered_expenses = expenses[expenses['Expense Necessity'] == "Essential"]
+                    neccesity_label = "essential"
                 elif selected_non_essential:
                     filtered_expenses = expenses[expenses['Expense Necessity'] == "Non-Essential"]
+                    neccesity_label = "non essential"
                 else:
                     filtered_expenses = expenses
+                    neccesity_label = ""
 
                 # Filtering by category
                 if selected_category != "All":
                     filtered_expenses = filtered_expenses[expenses['Expense Category'] == selected_category]
-                else:
-                    filtered_expenses = expenses
-
 
                 st.write(f"### {selected_category} expenses")
                 st.dataframe(filtered_expenses, hide_index=True, use_container_width=True)
+
+                expenses_sum = sum(filtered_expenses['Expense Value'])
+
+                col1_display_expense, col2_display_expense = st.columns(2, gap="small")
+
+                with col1_display_expense:
+                    st.subheader(f"Sum of {neccesity_label} {selected_category.lower()}  expenses: ")
+                with col2_display_expense:
+                    st.subheader(f"{expenses_sum}€")
+
         else:
             st.subheader("No data for chosen month available, please upload a file")
             file = st.file_uploader("Choose a file", type="xlsx", accept_multiple_files=False)
             if file is not None:
                 save_file_to_directory(file, 'data', f'{st.session_state.month.lower()}_{st.session_state.year}.xlsx')
                 st.experimental_rerun()
-    
