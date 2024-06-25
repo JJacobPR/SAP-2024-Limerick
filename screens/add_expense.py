@@ -1,11 +1,16 @@
 import streamlit as st
 import datetime
+import pandas as pd
+
+# Initialize the expense categories if not already in session state
+if 'expense_categories' not in st.session_state:
+    st.session_state.expense_categories = ['Food', 'Travel', 'Bills']
 
 def renderDatePicker():
     """
-        This function displays a date input inside of the page, and then returns the selected date
+    This function displays a date input inside of the page, and then returns the selected date.
     """
-    expense_date = st.date_input("When was this expense? ", datetime.date.today())
+    expense_date = st.date_input("When was this expense?", datetime.date.today())
     return expense_date
 
 def renderCategoryPicker():
@@ -19,12 +24,35 @@ def renderCategoryPicker():
             if new_option:
                 st.session_state.expense_categories.append(new_option)
                 st.success(f'New category "{new_option}" added.')
-    else:
-        col2.write("")
+                selection = new_option
+    return selection
 
 def add_expenses():
     st.title("Add new expense")
     expense_date = renderDatePicker()
-    st.text_input("Expense Name: ")
-    st.number_input("Expense Value: ", min_value=0)
-    renderCategoryPicker()
+    expense_name = st.text_input("Expense Name:")
+    expense_value = st.number_input("Expense Value:", min_value=0.0)
+    expense_category = renderCategoryPicker()
+
+    if st.button("Add Expense"):
+        new_expense = {
+            'Date': expense_date,
+            'Name': expense_name,
+            'Value': expense_value,
+            'Category': expense_category
+        }
+        add_expense_to_csv(new_expense)
+        st.success("Expense added successfully!")
+
+def add_expense_to_csv(expense):
+    """
+    Adds a new expense to the expenses.csv file.
+    """
+    try:
+        df = pd.read_csv('expenses.csv')
+    except FileNotFoundError:
+        df = pd.DataFrame(columns=['Date', 'Name', 'Value', 'Category'])
+    
+    new_expense_df = pd.DataFrame([expense])
+    df = pd.concat([df, new_expense_df], ignore_index=True)
+    df.to_csv('expenses.csv', index=False)
