@@ -79,16 +79,16 @@ def view_expense():
                 # Filtering by necessity
                 if selected_essential and selected_non_essential:
                     filtered_expenses = expenses
-                    neccesity_label = ""
+                    necessity_label = ""
                 elif selected_essential:
                     filtered_expenses = expenses[expenses['Expense Necessity'] == "Essential"]
-                    neccesity_label = "essential"
+                    necessity_label = "essential"
                 elif selected_non_essential:
                     filtered_expenses = expenses[expenses['Expense Necessity'] == "Non-Essential"]
-                    neccesity_label = "non essential"
+                    necessity_label = "non essential"
                 else:
                     filtered_expenses = expenses
-                    neccesity_label = ""
+                    necessity_label = ""
 
                 # Filtering by category
                 if selected_category != "All":
@@ -102,7 +102,7 @@ def view_expense():
                 col1_display_expense, col2_display_expense = st.columns(2, gap="small")
 
                 with col1_display_expense:
-                    st.subheader(f"Sum of {neccesity_label} {selected_category.lower()}  expenses: ")
+                    st.subheader(f"Sum of {necessity_label} {selected_category.lower()}  expenses: ")
                 with col2_display_expense:
                     st.subheader(f"{expenses_sum}€")
 
