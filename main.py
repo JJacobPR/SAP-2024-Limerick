@@ -1,10 +1,7 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 from screens.add_expense import add_expenses
 from screens.view_expense import view_expense
 from screens.overview import overview_tab
-
 
 st.set_page_config(
     page_title="Personal Finance Tracker",

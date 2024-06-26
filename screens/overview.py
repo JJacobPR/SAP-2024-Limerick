@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import calendar
 
-
 def overview_tab():
     st.title('At a Glance')
     getyearlydata()
