@@ -39,7 +39,6 @@ def create_data(months, expense_total, budget_total):
     sorted_budget_total = data['Budget'].tolist()
     return sorted_months, sorted_expense_total, sorted_budget_total
 
-@st.cache_data
 def getyearlydata():
     months = []
     expense_total = []
