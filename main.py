@@ -6,9 +6,15 @@ from screens.view_expense import view_expense
 from screens.overview import overview_tab
 
 
+st.set_page_config(
+    page_title="Personal Finance Tracker",
+    layout="centered",
+    initial_sidebar_state="expanded",
+)
+
 if 'page' not in st.session_state:
     st.session_state.page = 'main'
-    
+
 if 'expense_categories' not in st.session_state:
     st.session_state.expense_categories = []
 

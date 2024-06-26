@@ -6,6 +6,7 @@ import numpy as np
 import calendar
 import math as mt
 
+
 def read_expenses(file_path):
     try:
         expenses_df = pd.read_excel(file_path)

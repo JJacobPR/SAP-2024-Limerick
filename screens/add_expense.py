@@ -4,7 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-
 # Initialize the expense categories if not already in session state
 if 'expense_categories' not in st.session_state:
     st.session_state.expense_categories = ['Food', 'Travel', 'Bills']
