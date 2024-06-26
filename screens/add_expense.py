@@ -3,6 +3,8 @@ import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+
 # Initialize the expense categories if not already in session state
 if 'expense_categories' not in st.session_state:
     st.session_state.expense_categories = ['Food', 'Travel', 'Bills']
@@ -34,12 +36,14 @@ def add_expenses():
     expense_name = st.text_input("Expense Name:")
     expense_value = st.number_input("Expense Value:", min_value=0.0)
     expense_category = renderCategoryPicker()
+    selected_essential = st.checkbox("Essential Expense", False)
 
     if st.button("Add Expense"):
         new_expense = {
             'Date': expense_date,
             'Name': expense_name,
             'Value': expense_value,
+            'Expense Necessity': 'Essential' if selected_essential else 'Non-Essential',
             'Category': expense_category
         }
         add_expense_to_csv(new_expense)

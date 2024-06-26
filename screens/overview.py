@@ -5,10 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import calendar
 
+
 def overview_tab():
     st.title('At a Glance')
     getyearlydata()
 
+# @st.cache_data
 def getyearlydata():
     months = []
     expense_total = []
@@ -27,11 +29,12 @@ def getyearlydata():
             [month, year] = i.split('_')
             month = month.strip()
             months.append(month)
-            if expensesum > 1000:
-                st.toast(f'Budget exceeded for the month {month}')
-            else: 
-                st.balloons()
             year = year.split('.')[0]
+            if st.session_state.page == 'Overview':
+                if expensesum > budget:
+                    st.toast(f'Budget exceeded for the month of {month}', icon="🚨")
+                else: 
+                    st.balloons()
     
     # Create a DataFrame for easier sorting
     data = pd.DataFrame({
@@ -68,4 +71,3 @@ def getyearlydata():
     plt.xticks(rotation=90)  # Rotate the labels by 45 degrees
     ax.legend()
     st.pyplot(fig)
-

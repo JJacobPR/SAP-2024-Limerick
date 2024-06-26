@@ -4,11 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import calendar
+import math as mt
 
-# Function to read and display the Excel file
+# Function to read and display the full data from the Excel file
 def read_expenses(file_path):
     try:
-        # Read the Excel file into a DataFrame
+        # Read all columns from the Excel file
         expenses_df = pd.read_excel(file_path)
         return expenses_df
     except FileNotFoundError:
@@ -16,7 +17,7 @@ def read_expenses(file_path):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-
+@st.cache_data
 def process_expenses():
     data_folder = 'data'
     files = [f for f in os.listdir(data_folder) if f.endswith('.xlsx')]
@@ -139,10 +140,10 @@ def view_expense():
 
                 # Filtering by category
                 if selected_category != "All":
-                    filtered_expenses = filtered_expenses[expenses['Expense Category'] == selected_category]
+                    filtered_expenses = filtered_expenses[filtered_expenses['Expense Category'] == selected_category]
 
                 st.write(f"### {selected_category} expenses")
-                st.dataframe(filtered_expenses, hide_index=True, use_container_width=True)
+                st.dataframe(filtered_expenses[['Expense Name', 'Expense Category', 'Expense Necessity', 'Expense Value']], hide_index=True, use_container_width=True)
 
                 expenses_sum = sum(filtered_expenses['Expense Value'])
 
@@ -150,8 +151,14 @@ def view_expense():
 
                 with col1_display_expense:
                     st.subheader(f"Sum of {necessity_label} {selected_category.lower()}  expenses: ")
+                    st.subheader('Budget: ')
                 with col2_display_expense:
                     st.subheader(f"{expenses_sum}€")
+                    st.subheader(f'{(mt.trunc(filtered_expenses.get('Budget', 1)[0]))}€')
+
+                # # Optionally display the Budget column
+                # if st.checkbox("Show Budget"):
+                #     st.dataframe(filtered_expenses[['Expense Category', 'Expense Necessity', 'Expense Value', 'Budget']], hide_index=True, use_container_width=True)
 
         else:
             st.subheader("No data for chosen month available, please upload a file")
@@ -159,3 +166,4 @@ def view_expense():
             if file is not None:
                 save_file_to_directory(file, 'data', f'{st.session_state.month.lower()}_{st.session_state.year}.xlsx')
                 st.experimental_rerun()
+
