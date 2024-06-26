@@ -1,7 +1,9 @@
 import streamlit as st
 import os
 import pandas as pd
-
+import matplotlib.pyplot as plt
+import numpy as np
+import calendar
 
 # Function to read and display the Excel file
 def read_expenses(file_path):
@@ -15,6 +17,50 @@ def read_expenses(file_path):
         print(f"An error occurred: {e}")
 
 
+def process_expenses():
+    data_folder = 'data'
+    files = [f for f in os.listdir(data_folder) if f.endswith('.xlsx')]
+
+    months = []
+    expense_sums = []
+
+    for file in files:
+        [month, year] = file.split('_')
+        months.append(month)
+
+        year = year.split('.')[0]
+        data = pd.read_excel(os.path.join(data_folder, file))
+        expense_sum = sum(data['Expense Value'])
+        expense_sums.append(expense_sum)
+
+    x = np.array(months)
+    y = np.array(expense_sums)
+
+    month_order = list(calendar.month_name)[1:]  # ['January', 'February', ..., 'December']
+    data = pd.DataFrame({
+        'Month': months,
+        'Expense': expense_sums,
+    })
+    # Standardize month names to match the order
+    data['Month'] = data['Month'].apply(lambda x: x.capitalize())
+    
+    # Sort data by the defined month order
+    data['Month'] = pd.Categorical(data['Month'], categories=month_order, ordered=True)
+    data = data.sort_values('Month')
+
+    # Extract sorted values
+    sorted_months = data['Month'].tolist()
+    sorted_expense_total = data['Expense'].tolist()
+
+    fig, ax = plt.subplots()
+    ax.bar(sorted_months, sorted_expense_total)
+    ax.set_xlabel('Months')
+    ax.set_ylabel('Total Expense')
+    ax.set_title('Monthly Expenses for the Year')
+    plt.xticks(rotation=90)
+    st.pyplot(fig)
+
+    
 def save_file_to_directory(file_path, save_dir, file_name):
     try:
         # Read the Excel file into a DataFrame
@@ -37,6 +83,7 @@ def save_file_to_directory(file_path, save_dir, file_name):
 
 
 def view_expense():
+    process_expenses()
     st.title('Expense Overview')
 
     st.session_state.year = st.selectbox(

@@ -1,10 +1,10 @@
-.idea
+.idea/
 .venv
 etc
 share
 init
 include
 __pycache__
-./lib/*
-bin/
+lib
+bin
 delete

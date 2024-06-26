@@ -46,7 +46,7 @@ def add_expenses():
         st.success("Expense added successfully!")
         display_expense_plot()
 
-def add_expense_to_csv(expense):
+def add_expense_to_csv(expense, filepath=None):
     """
     Adds a new expense to the expenses.csv file.
     """
