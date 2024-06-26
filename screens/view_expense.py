@@ -94,8 +94,7 @@ def view_expense():
 
     st.session_state.month = st.selectbox(
         "Select month",
-        ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November",
-         "December")
+        list(calendar.month_name[1:])
     )
 
     if st.session_state.year and st.session_state.month:
@@ -124,7 +123,6 @@ def view_expense():
                     st.text("")
                     selected_non_essential = st.checkbox("Non Essential", False)
 
-                # Filtering by necessity
                 if selected_essential and selected_non_essential:
                     filtered_expenses = expenses
                     necessity_label = ""
@@ -138,7 +136,6 @@ def view_expense():
                     filtered_expenses = expenses
                     necessity_label = ""
 
-                # Filtering by category
                 if selected_category != "All":
                     filtered_expenses = filtered_expenses[filtered_expenses['Expense Category'] == selected_category]
 
@@ -155,11 +152,6 @@ def view_expense():
                 with col2_display_expense:
                     st.subheader(f"{expenses_sum}€")
                     st.subheader(f'{(mt.trunc(filtered_expenses.get('Budget', 1)[0]))}€')
-
-                # # Optionally display the Budget column
-                # if st.checkbox("Show Budget"):
-                #     st.dataframe(filtered_expenses[['Expense Category', 'Expense Necessity', 'Expense Value', 'Budget']], hide_index=True, use_container_width=True)
-
         else:
             st.subheader("No data for chosen month available, please upload a file")
             file = st.file_uploader("Choose a file", type="xlsx", accept_multiple_files=False)
