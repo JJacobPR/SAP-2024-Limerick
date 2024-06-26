@@ -8,3 +8,4 @@ __pycache__
 lib
 bin
 delete
+.DS_Store
