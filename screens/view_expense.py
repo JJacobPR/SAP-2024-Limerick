@@ -6,7 +6,6 @@ import numpy as np
 import calendar
 import math as mt
 
-
 def read_expenses(file_path):
     try:
         expenses_df = pd.read_excel(file_path)
@@ -59,7 +58,6 @@ def process_expenses():
     plt.xticks(rotation=90)
     st.pyplot(fig)
 
-    
 def save_file_to_directory(file_path, save_dir, file_name):
     try:
         # Read the Excel file into a DataFrame
@@ -80,6 +78,56 @@ def save_file_to_directory(file_path, save_dir, file_name):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+def render_elements_on_page(expenses):
+    st.session_state.expense_categories = [cat for cat in expenses['Expense Category'].unique().tolist() if pd.notna(cat)]
+
+    col1_filtering, col2_filtering, col3_filtering = st.columns(3)
+
+    with col1_filtering:
+        selected_category = st.selectbox(
+            "Select Expense Category",
+            ["All"] + st.session_state.expense_categories
+        )
+
+    with col2_filtering:
+        st.text("")
+        st.text("")
+        selected_essential = st.checkbox("Essential", False)
+
+    with col3_filtering:
+        st.text("")
+        st.text("")
+        selected_non_essential = st.checkbox("Non Essential", False)
+
+    if selected_essential and selected_non_essential:
+        filtered_expenses = expenses
+        necessity_label = ""
+    elif selected_essential:
+        filtered_expenses = expenses[expenses['Expense Necessity'] == "Essential"]
+        necessity_label = "essential"
+    elif selected_non_essential:
+        filtered_expenses = expenses[expenses['Expense Necessity'] == "Non-Essential"]
+        necessity_label = "non essential"
+    else:
+        filtered_expenses = expenses
+        necessity_label = ""
+
+    if selected_category != "All":
+        filtered_expenses = filtered_expenses[filtered_expenses['Expense Category'] == selected_category]
+
+    st.write(f"### {selected_category} expenses")
+    st.dataframe(filtered_expenses[['Expense Name', 'Expense Category', 'Expense Necessity', 'Expense Value']], hide_index=True, use_container_width=True)
+
+    expenses_sum = sum(filtered_expenses['Expense Value'])
+
+    col1_display_expense, col2_display_expense = st.columns(2, gap="small")
+
+    with col1_display_expense:
+        st.subheader(f"Sum of {necessity_label} {selected_category.lower()}  expenses: ")
+        st.subheader('Budget: ')
+    with col2_display_expense:
+        st.subheader(f"{expenses_sum}€")
+        st.subheader(f'{(mt.trunc(filtered_expenses.get('Budget', 1)[0]))}€')
 
 def view_expense():
     process_expenses()
@@ -100,60 +148,10 @@ def view_expense():
         if os.path.exists(file_path):
             expenses = read_expenses(file_path)
             if expenses is not None:
-                st.session_state.expense_categories = [cat for cat in expenses['Expense Category'].unique().tolist() if
-                                                       pd.notna(cat)]
-
-                col1_filtering, col2_filtering, col3_filtering = st.columns(3)
-
-                with col1_filtering:
-                    selected_category = st.selectbox(
-                        "Select Expense Category",
-                        ["All"] + st.session_state.expense_categories
-                    )
-
-                with col2_filtering:
-                    st.text("")
-                    st.text("")
-                    selected_essential = st.checkbox("Essential", False)
-
-                with col3_filtering:
-                    st.text("")
-                    st.text("")
-                    selected_non_essential = st.checkbox("Non Essential", False)
-
-                if selected_essential and selected_non_essential:
-                    filtered_expenses = expenses
-                    necessity_label = ""
-                elif selected_essential:
-                    filtered_expenses = expenses[expenses['Expense Necessity'] == "Essential"]
-                    necessity_label = "essential"
-                elif selected_non_essential:
-                    filtered_expenses = expenses[expenses['Expense Necessity'] == "Non-Essential"]
-                    necessity_label = "non essential"
-                else:
-                    filtered_expenses = expenses
-                    necessity_label = ""
-
-                if selected_category != "All":
-                    filtered_expenses = filtered_expenses[filtered_expenses['Expense Category'] == selected_category]
-
-                st.write(f"### {selected_category} expenses")
-                st.dataframe(filtered_expenses[['Expense Name', 'Expense Category', 'Expense Necessity', 'Expense Value']], hide_index=True, use_container_width=True)
-
-                expenses_sum = sum(filtered_expenses['Expense Value'])
-
-                col1_display_expense, col2_display_expense = st.columns(2, gap="small")
-
-                with col1_display_expense:
-                    st.subheader(f"Sum of {necessity_label} {selected_category.lower()}  expenses: ")
-                    st.subheader('Budget: ')
-                with col2_display_expense:
-                    st.subheader(f"{expenses_sum}€")
-                    st.subheader(f'{(mt.trunc(filtered_expenses.get('Budget', 1)[0]))}€')
+                render_elements_on_page(expenses)
         else:
             st.subheader("No data for chosen month available, please upload a file")
             file = st.file_uploader("Choose a file", type="xlsx", accept_multiple_files=False)
             if file is not None:
                 save_file_to_directory(file, 'data', f'{st.session_state.month.lower()}_{st.session_state.year}.xlsx')
-                st.experimental_rerun()
-
+                st.rerun()

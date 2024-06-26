@@ -10,7 +10,36 @@ def overview_tab():
     st.title('At a Glance')
     getyearlydata()
 
-# @st.cache_data
+def render_elements_on_page(sorted_months, sorted_expense_total, sorted_budget_total):
+    fig, ax = plt.subplots()
+    ax.set_title('Monthly Expenses and Budget')
+    ax.set_xlabel('Months')
+    index = np.arange(len(sorted_months))
+    ax.bar(index, sorted_expense_total, label='Expenses', width=0.25)
+    ax.bar(index + 0.25, sorted_budget_total, label='Budget', width=0.25)
+    ax.set_ylabel('Amount Spent')
+    ax.set_xticks(index + 0.25 / 2)
+    ax.set_xticklabels(sorted_months)
+    plt.xticks(rotation=90)
+    ax.legend()
+    st.pyplot(fig)
+
+def create_data(months, expense_total, budget_total):
+    data = pd.DataFrame({
+        'Month': months,
+        'Expense': expense_total,
+        'Budget': budget_total
+    })
+    month_order = list(calendar.month_name)[1:]  # ['January', 'February', ..., 'December']
+    data['Month'] = data['Month'].apply(lambda x: x.capitalize())
+    data['Month'] = pd.Categorical(data['Month'], categories=month_order, ordered=True)
+    data = data.sort_values('Month')
+    sorted_months = data['Month'].tolist()
+    sorted_expense_total = data['Expense'].tolist()
+    sorted_budget_total = data['Budget'].tolist()
+    return sorted_months, sorted_expense_total, sorted_budget_total
+
+@st.cache_data
 def getyearlydata():
     months = []
     expense_total = []
@@ -37,37 +66,6 @@ def getyearlydata():
                     st.balloons()
     
     # Create a DataFrame for easier sorting
-    data = pd.DataFrame({
-        'Month': months,
-        'Expense': expense_total,
-        'Budget': budget_total
-    })
+    sorted_months, sorted_expense_total, sorted_budget_total = create_data(months, expense_total, budget_total)
     
-    # Define month order
-    month_order = list(calendar.month_name)[1:]  # ['January', 'February', ..., 'December']
-    
-    # Standardize month names to match the order
-    data['Month'] = data['Month'].apply(lambda x: x.capitalize())
-    
-    # Sort data by the defined month order
-    data['Month'] = pd.Categorical(data['Month'], categories=month_order, ordered=True)
-    data = data.sort_values('Month')
-
-    # Extract sorted values
-    sorted_months = data['Month'].tolist()
-    sorted_expense_total = data['Expense'].tolist()
-    sorted_budget_total = data['Budget'].tolist()
-
-    # Plotting
-    fig, ax = plt.subplots()
-    ax.set_title('Monthly Expenses and Budget')
-    ax.set_xlabel('Months')
-    index = np.arange(len(sorted_months))
-    ax.bar(index, sorted_expense_total, label='Expenses', width=0.25)
-    ax.bar(index + 0.25, sorted_budget_total, label='Budget', width=0.25)
-    ax.set_ylabel('Amount Spent')
-    ax.set_xticks(index + 0.25 / 2)
-    ax.set_xticklabels(sorted_months)
-    plt.xticks(rotation=90)  # Rotate the labels by 45 degrees
-    ax.legend()
-    st.pyplot(fig)
+    render_elements_on_page(sorted_months, sorted_expense_total, sorted_budget_total)
