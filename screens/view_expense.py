@@ -6,10 +6,8 @@ import numpy as np
 import calendar
 import math as mt
 
-# Function to read and display the full data from the Excel file
 def read_expenses(file_path):
     try:
-        # Read all columns from the Excel file
         expenses_df = pd.read_excel(file_path)
         return expenses_df
     except FileNotFoundError:
@@ -21,7 +19,6 @@ def read_expenses(file_path):
 def process_expenses():
     data_folder = 'data'
     files = [f for f in os.listdir(data_folder) if f.endswith('.xlsx')]
-
     months = []
     expense_sums = []
 
