@@ -80,6 +80,7 @@ def save_file_to_directory(file_path, save_dir, file_name):
 
 def render_elements_on_page(expenses):
     st.session_state.expense_categories = [cat for cat in expenses['Expense Category'].unique().tolist() if pd.notna(cat)]
+    budget_value = expenses['Budget'].iloc[0] if 'Budget' in expenses.columns and not expenses['Budget'].isnull().all() else 1000
 
     col1_filtering, col2_filtering, col3_filtering = st.columns(3)
 
@@ -127,7 +128,9 @@ def render_elements_on_page(expenses):
         st.subheader('Budget: ')
     with col2_display_expense:
         st.subheader(f"{expenses_sum}€")
-        st.subheader(f'{(mt.trunc(filtered_expenses.get('Budget', 1)[0]))}€')
+        st.subheader(f'{mt.trunc(budget_value)}€')
+
+
 
 def view_expense():
     process_expenses()
